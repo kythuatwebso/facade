@@ -59,12 +59,12 @@ class DefaultLaravel
                 'disks'   => [
                     'local' => [
                         'driver' => 'local',
-                        'root'   => base_path(),
+                        'root'   => app()->basePath(),
                         'throw'  => false,
                     ],
                     'public' => [
                         'driver'     => 'local',
-                        'root'       => base_path(),
+                        'root'       => app()->basePath(),
                         'url'        => env('APP_URL').'/storage',
                         'visibility' => 'public',
                         'throw'      => false,
@@ -73,7 +73,7 @@ class DefaultLaravel
             ],
             'view' => [
                 'paths' => [
-                    base_path('views'),
+                    app()->basePath('views'),
                 ],
                 'compiled' => env(
                     'VIEW_COMPILED_PATH',

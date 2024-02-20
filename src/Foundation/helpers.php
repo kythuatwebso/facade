@@ -1,22 +1,13 @@
 <?php
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
-use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Foundation\Bus\PendingClosureDispatch;
-use Illuminate\Foundation\Bus\PendingDispatch;
-use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
@@ -148,23 +139,6 @@ if (! function_exists('asset')) {
     }
 }
 
-if (! function_exists('auth')) {
-    /**
-     * Get the available auth instance.
-     *
-     * @param  string|null  $guard
-     * @return \Illuminate\Contracts\Auth\Factory|\Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
-     */
-    function auth($guard = null)
-    {
-        if (is_null($guard)) {
-            return app(AuthFactory::class);
-        }
-
-        return app(AuthFactory::class)->guard($guard);
-    }
-}
-
 if (! function_exists('back')) {
     /**
      * Create a new redirect response to the previous location.
@@ -207,19 +181,6 @@ if (! function_exists('bcrypt')) {
     }
 }
 
-if (! function_exists('broadcast')) {
-    /**
-     * Begin broadcasting an event.
-     *
-     * @param  mixed|null  $event
-     * @return \Illuminate\Broadcasting\PendingBroadcast
-     */
-    function broadcast($event = null)
-    {
-        return app(BroadcastFactory::class)->event($event);
-    }
-}
-
 if (! function_exists('cache')) {
     /**
      * Get / set the specified cache value.
@@ -248,30 +209,6 @@ if (! function_exists('cache')) {
         }
 
         return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1] ?? null);
-    }
-}
-
-if (! function_exists('config')) {
-    /**
-     * Get / set the specified configuration value.
-     *
-     * If an array is passed as the key, we will assume you want to set an array of values.
-     *
-     * @param  array|string|null  $key
-     * @param  mixed  $default
-     * @return mixed|\Illuminate\Config\Repository
-     */
-    function config($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return app('config');
-        }
-
-        if (is_array($key)) {
-            return app('config')->set($key);
-        }
-
-        return app('config')->get($key, $default);
     }
 }
 
@@ -371,37 +308,6 @@ if (! function_exists('decrypt')) {
     function decrypt($value, $unserialize = true)
     {
         return app('encrypter')->decrypt($value, $unserialize);
-    }
-}
-
-if (! function_exists('dispatch')) {
-    /**
-     * Dispatch a job to its appropriate handler.
-     *
-     * @param  mixed  $job
-     * @return \Illuminate\Foundation\Bus\PendingDispatch
-     */
-    function dispatch($job)
-    {
-        return $job instanceof Closure
-                ? new PendingClosureDispatch(CallQueuedClosure::create($job))
-                : new PendingDispatch($job);
-    }
-}
-
-if (! function_exists('dispatch_sync')) {
-    /**
-     * Dispatch a command to its appropriate handler in the current process.
-     *
-     * Queueable jobs will be dispatched to the "sync" queue.
-     *
-     * @param  mixed  $job
-     * @param  mixed  $handler
-     * @return mixed
-     */
-    function dispatch_sync($job, $handler = null)
-    {
-        return app(Dispatcher::class)->dispatchSync($job, $handler);
     }
 }
 
@@ -530,22 +436,6 @@ if (! function_exists('method_field')) {
     }
 }
 
-if (! function_exists('mix')) {
-    /**
-     * Get the path to a versioned Mix file.
-     *
-     * @param  string  $path
-     * @param  string  $manifestDirectory
-     * @return \Illuminate\Support\HtmlString|string
-     *
-     * @throws \Exception
-     */
-    function mix($path, $manifestDirectory = '')
-    {
-        return app(Mix::class)(...func_get_args());
-    }
-}
-
 if (! function_exists('now')) {
     /**
      * Create a new Carbon instance for the current time.
@@ -570,21 +460,6 @@ if (! function_exists('old')) {
     function old($key = null, $default = null)
     {
         return app('request')->old($key, $default);
-    }
-}
-
-if (! function_exists('policy')) {
-    /**
-     * Get a policy instance for a given class.
-     *
-     * @param  object|string  $class
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException
-     */
-    function policy($class)
-    {
-        return app(Gate::class)->getPolicyFor($class);
     }
 }
 
@@ -696,30 +571,6 @@ if (! function_exists('report_unless')) {
         if (! $boolean) {
             report($exception);
         }
-    }
-}
-
-if (! function_exists('request')) {
-    /**
-     * Get an instance of the current request or an input item from the request.
-     *
-     * @param  array|string|null  $key
-     * @param  mixed  $default
-     * @return mixed|\Illuminate\Http\Request|string|array|null
-     */
-    function request($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return app('request');
-        }
-
-        if (is_array($key)) {
-            return app('request')->only($key);
-        }
-
-        $value = app('request')->__get($key);
-
-        return is_null($value) ? value($default) : $value;
     }
 }
 
@@ -956,25 +807,6 @@ if (! function_exists('__')) {
         }
 
         return trans($key, $replace, $locale);
-    }
-}
-
-if (! function_exists('url')) {
-    /**
-     * Generate a url for the application.
-     *
-     * @param  string|null  $path
-     * @param  mixed  $parameters
-     * @param  bool|null  $secure
-     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
-     */
-    function url($path = null, $parameters = [], $secure = null)
-    {
-        if (is_null($path)) {
-            return app(UrlGenerator::class);
-        }
-
-        return app(UrlGenerator::class)->to($path, $parameters, $secure);
     }
 }
 
