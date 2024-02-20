@@ -125,20 +125,6 @@ if (! function_exists('app_path')) {
     }
 }
 
-if (! function_exists('asset')) {
-    /**
-     * Generate an asset path for the application.
-     *
-     * @param  string  $path
-     * @param  bool|null  $secure
-     * @return string
-     */
-    function asset($path, $secure = null)
-    {
-        return app('url')->asset($path, $secure);
-    }
-}
-
 if (! function_exists('back')) {
     /**
      * Create a new redirect response to the previous location.
