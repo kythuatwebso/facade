@@ -47,7 +47,13 @@ class LaraApp extends Container
         \Websovn\Facades\BootProviders::class,
     ];
 
-    public function __construct($basePath = null)
+    /**
+     * @param string|array|null $useService
+     * 'File', 'Cache', 'Response', 'View', 'Blade'
+     * 'Crypt', 'Hash', 'Session', 'Storage', 'Validator'
+     * 'Http', 'Request', 'URL', 'Date'
+     */
+    public function __construct($basePath = null, string|array|null $useService = null)
     {
         if ($basePath) {
             $this->setBasePath($basePath);
@@ -55,8 +61,14 @@ class LaraApp extends Container
 
         $this->makeStorageDirectory();
 
+        DefaultLaravel::useService($useService);
+
         $this->registerBaseBindings();
-        $this->registerBaseServiceProviders();
+
+        if (! is_null($useService)) {
+            $this->registerBaseServiceProviders();
+        }
+
         $this->registerCoreContainerAliases();
     }
 
