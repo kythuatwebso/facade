@@ -1,0 +1,39 @@
+{
+    "name": "websovn/facade",
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "src/Foundation/helpers.php"
+        ],
+        "classmap": [
+            "src"
+        ],
+        "psr-4": {
+            "Websovn\\Facades\\": ""
+        }
+    },
+    "require": {
+        "illuminate/container": "*",
+        "illuminate/support": "*",
+        "illuminate/config": "*",
+        "illuminate/filesystem": "*",
+        "league/flysystem": "*",
+        "illuminate/cache": "*",
+        "illuminate/routing": "*",
+        "illuminate/http": "*",
+        "illuminate/events": "*",
+        "illuminate/session": "*",
+        "illuminate/cookie": "*",
+        "illuminate/validation": "*",
+        "illuminate/view": "*",
+        "illuminate/encryption": "*",
+        "illuminate/hashing": "*",
+        "symfony/var-dumper": "*",
+        "symfony/error-handler": "*",
+        "phpoption/phpoption": "*",
+        "vlucas/phpdotenv": "*",
+        "symfony/http-kernel": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
