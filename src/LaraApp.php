@@ -53,11 +53,11 @@ class LaraApp extends Container
             $this->setBasePath($basePath);
         }
 
+        $this->makeStorageDirectory();
+
         $this->registerBaseBindings();
         $this->registerBaseServiceProviders();
         $this->registerCoreContainerAliases();
-
-        $this->makeStorageDirectory();
     }
 
     protected function registerBaseServiceProviders()
@@ -85,9 +85,8 @@ class LaraApp extends Container
         $files = new Filesystem();
 
         $directories = [
-            base_path('storage/cache'),
-            base_path('storage/cache/views'),
-            base_path('storage/cache/sessions'),
+            $this->basePath.'/storage/cache/views',
+            $this->basePath.'/storage/cache/sessions',
         ];
 
         foreach ($directories as $dir) {
@@ -223,19 +222,30 @@ class LaraApp extends Container
             ->load($providers->collapse()->toArray());
     }
 
+    protected function cachePath($path = '')
+    {
+        $cachePath = $this->basePath.'/storage/cache';
+
+        if ($path) {
+            return $cachePath.DIRECTORY_SEPARATOR.$path;
+        }
+
+        return $cachePath;
+    }
+
     protected function getCachedServicesPath()
     {
-        return dirname(__DIR__).'/storage/cache/services.php';
+        return $this->cachePath('services.php');
     }
 
     public function getCachedPackagesPath()
     {
-        return dirname(__DIR__).'/storage/cache/packages.php';
+        return $this->cachePath('packages.php');
     }
 
     public function getCachedConfigPath()
     {
-        return dirname(__DIR__).'/storage/cache/config.php';
+        return $this->cachePath('config.php');
     }
 
     public function configurationIsCached()
