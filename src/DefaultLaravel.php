@@ -109,8 +109,9 @@ class DefaultLaravel
         $collect = collect(static::$servicesAllow);
 
         foreach ($services as $service) {
+
             $collect
-                ->filter(fn ($items, $key) => str($key)->lower()->exactly(strtolower($service)))
+                ->when(! in_array('*', $services), fn ($collect) => $collect->filter(fn ($items, $key) => str($key)->lower()->exactly(strtolower($service))))
                 ->each(function ($items, $key) {
 
                     if (is_array($providers = $items[self::PROVIDER])) {
@@ -139,9 +140,11 @@ class DefaultLaravel
                     } else {
                         static::$aliases[] = $aliases;
                     }
-
                 });
         }
+
+        static::$providers = collect(static::$providers)->unique()->values()->toArray();
+        static::$facades   = collect(static::$facades)->unique()->toArray();
     }
 
     public static function configs()
