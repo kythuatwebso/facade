@@ -38,7 +38,8 @@ class LaraApp extends Container
     protected $environmentFile = '.env';
     protected $isRunningInConsole;
     protected $namespace;
-    protected $absoluteCachePathPrefixes = ['/', '\\'];
+    protected $absoluteCachePathPrefixes    = ['/', '\\'];
+    protected string|array|null $useService = null;
 
     protected $bootstrappers = [
         \Websovn\Facades\LoadLaravelConfiguration::class,
@@ -63,6 +64,8 @@ class LaraApp extends Container
 
         DefaultLaravel::useService($useService);
 
+        $this->useService = $useService;
+
         $this->registerBaseBindings();
 
         if (! is_null($useService)) {
@@ -70,6 +73,48 @@ class LaraApp extends Container
         }
 
         $this->registerCoreContainerAliases();
+    }
+
+    /**
+     * Đăng ký Facade vào smarty
+     *
+     * Sử dụng: `{Facade\Date::now()}`
+     */
+    public function registerSmarty($smarty_class_object)
+    {
+        $prefix     = 'Facade';
+        $method     = 'registerClass';
+        $useService = is_null($useService = $this->useService)
+            ? null
+            : (array) $useService;
+
+        $servicesDefault = [
+            'Arr'      => \Illuminate\Support\Arr::class,
+            'Str'      => \Illuminate\Support\Str::class,
+            'Number'   => \Illuminate\Support\Number::class,
+            'Date'     => \Illuminate\Support\Facades\Date::class,
+            'Http'     => \Illuminate\Support\Facades\Http::class,
+            'Redirect' => \Illuminate\Support\Facades\Redirect::class,
+            'Request'  => \Illuminate\Support\Facades\Request::class,
+            'URL'      => \Illuminate\Support\Facades\URL::class,
+        ];
+
+        $classRegisters = [];
+        if (! is_null($useService)) {
+            $classRegisters = array_merge(
+                $servicesDefault,
+                DefaultLaravel::facades()
+            );
+        }
+
+        if (count($classRegisters) > 0) {
+            foreach ($classRegisters as $name => $class) {
+                $smarty_class_object->{$method}(
+                    "{$prefix}\\{$name}",
+                    $class
+                );
+            }
+        }
     }
 
     protected function registerBaseServiceProviders()
