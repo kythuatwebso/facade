@@ -2,7 +2,6 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
@@ -30,7 +29,7 @@ if (! function_exists('abort')) {
         if ($code instanceof Response) {
             throw new HttpResponseException($code);
         } elseif ($code instanceof Responsable) {
-            throw new HttpResponseException($code->toResponse(request()));
+            throw new HttpResponseException($code->toResponse(app('request')));
         }
 
         app()->abort($code, $message, $headers);
@@ -228,6 +227,9 @@ if (! function_exists('cookie')) {
      */
     function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
     {
+        /**
+         * @var \Illuminate\Cookie\CookieJar $cookie
+         */
         $cookie = app(CookieFactory::class);
 
         if (is_null($name)) {
@@ -326,63 +328,6 @@ if (! function_exists('event')) {
     }
 }
 
-if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
-    /**
-     * Get a faker instance.
-     *
-     * @param  string|null  $locale
-     * @return \Faker\Generator
-     */
-    function fake($locale = null)
-    {
-        if (app()->bound('config')) {
-            $locale ??= app('config')->get('app.faker_locale');
-        }
-
-        $locale ??= 'en_US';
-
-        $abstract = \Faker\Generator::class.':'.$locale;
-
-        if (! app()->bound($abstract)) {
-            app()->singleton($abstract, fn () => \Faker\Factory::create($locale));
-        }
-
-        return app()->make($abstract);
-    }
-}
-
-if (! function_exists('info')) {
-    /**
-     * Write some information to the log.
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
-     */
-    function info($message, $context = [])
-    {
-        app('log')->info($message, $context);
-    }
-}
-
-if (! function_exists('logger')) {
-    /**
-     * Log a debug message to the logs.
-     *
-     * @param  string|null  $message
-     * @param  array  $context
-     * @return \Illuminate\Log\LogManager|null
-     */
-    function logger($message = null, array $context = [])
-    {
-        if (is_null($message)) {
-            return app('log');
-        }
-
-        return app('log')->debug($message, $context);
-    }
-}
-
 if (! function_exists('lang_path')) {
     /**
      * Get the path to the language folder.
@@ -393,19 +338,6 @@ if (! function_exists('lang_path')) {
     function lang_path($path = '')
     {
         return app()->langPath($path);
-    }
-}
-
-if (! function_exists('logs')) {
-    /**
-     * Get a log driver instance.
-     *
-     * @param  string|null  $driver
-     * @return \Illuminate\Log\LogManager|\Psr\Log\LoggerInterface
-     */
-    function logs($driver = null)
-    {
-        return $driver ? app('log')->driver($driver) : app('log');
     }
 }
 
@@ -463,14 +395,14 @@ if (! function_exists('precognitive')) {
         };
 
         $payload = $callable(function ($default, $precognition = null) {
-            $response = request()->isPrecognitive()
+            $response = app('request')->isPrecognitive()
                 ? ($precognition ?? $default)
                 : $default;
 
-            abort(Router::toResponse(request(), value($response)));
+            abort(Router::toResponse(app('request'), value($response)));
         });
 
-        if (request()->isPrecognitive()) {
+        if (app('request')->isPrecognitive()) {
             abort(204, headers: ['Precognition-Success' => 'true']);
         }
 
@@ -508,81 +440,6 @@ if (! function_exists('redirect')) {
         }
 
         return app('redirect')->to($to, $status, $headers, $secure);
-    }
-}
-
-if (! function_exists('report')) {
-    /**
-     * Report an exception.
-     *
-     * @param  \Throwable|string  $exception
-     * @return void
-     */
-    function report($exception)
-    {
-        if (is_string($exception)) {
-            $exception = new Exception($exception);
-        }
-
-        app(ExceptionHandler::class)->report($exception);
-    }
-}
-
-if (! function_exists('report_if')) {
-    /**
-     * Report an exception if the given condition is true.
-     *
-     * @param  bool  $boolean
-     * @param  \Throwable|string  $exception
-     * @return void
-     */
-    function report_if($boolean, $exception)
-    {
-        if ($boolean) {
-            report($exception);
-        }
-    }
-}
-
-if (! function_exists('report_unless')) {
-    /**
-     * Report an exception unless the given condition is true.
-     *
-     * @param  bool  $boolean
-     * @param  \Throwable|string  $exception
-     * @return void
-     */
-    function report_unless($boolean, $exception)
-    {
-        if (! $boolean) {
-            report($exception);
-        }
-    }
-}
-
-if (! function_exists('rescue')) {
-    /**
-     * Catch a potential exception and return a default value.
-     *
-     * @template TRescueValue
-     * @template TRescueFallback
-     *
-     * @param  callable(): TRescueValue  $callback
-     * @param  (callable(\Throwable): TRescueFallback)|TRescueFallback  $rescue
-     * @param  bool|callable  $report
-     * @return TRescueValue|TRescueFallback
-     */
-    function rescue(callable $callback, $rescue = null, $report = true)
-    {
-        try {
-            return $callback();
-        } catch (Throwable $e) {
-            if (value($report, $e)) {
-                report($e);
-            }
-
-            return value($rescue, $e);
-        }
     }
 }
 
@@ -624,6 +481,9 @@ if (! function_exists('response')) {
      */
     function response($content = '', $status = 200, array $headers = [])
     {
+        /**
+         * @var \Illuminate\Http\Response $factory
+         */
         $factory = app(ResponseFactory::class);
 
         if (func_num_args() === 0) {
@@ -646,33 +506,6 @@ if (! function_exists('route')) {
     function route($name, $parameters = [], $absolute = true)
     {
         return app('url')->route($name, $parameters, $absolute);
-    }
-}
-
-if (! function_exists('secure_asset')) {
-    /**
-     * Generate an asset path for the application.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    function secure_asset($path)
-    {
-        return asset($path, true);
-    }
-}
-
-if (! function_exists('secure_url')) {
-    /**
-     * Generate a HTTPS url for the application.
-     *
-     * @param  string  $path
-     * @param  mixed  $parameters
-     * @return string
-     */
-    function secure_url($path, $parameters = [])
-    {
-        return url($path, $parameters, true);
     }
 }
 
