@@ -3,7 +3,7 @@
 ## Install
 
 ```json
-composer require websovn/facade
+composer require friendsofwebso/facade
 ```
 
 ## Use
