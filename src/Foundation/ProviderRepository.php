@@ -38,8 +38,8 @@ class ProviderRepository
      */
     public function __construct(LaraApp $app, Filesystem $files, $manifestPath)
     {
-        $this->app          = $app;
-        $this->files        = $files;
+        $this->app = $app;
+        $this->files = $files;
         $this->manifestPath = $manifestPath;
     }
 

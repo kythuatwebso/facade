@@ -19,14 +19,14 @@ class LaraApp extends Container
     use Macroable;
 
     protected $basePath;
-    protected $hasBeenBootstrapped  = false;
-    protected $booted               = false;
-    protected $bootingCallbacks     = [];
-    protected $bootedCallbacks      = [];
+    protected $hasBeenBootstrapped = false;
+    protected $booted = false;
+    protected $bootingCallbacks = [];
+    protected $bootedCallbacks = [];
     protected $terminatingCallbacks = [];
-    protected $serviceProviders     = [];
-    protected $loadedProviders      = [];
-    protected $deferredServices     = [];
+    protected $serviceProviders = [];
+    protected $loadedProviders = [];
+    protected $deferredServices = [];
     protected $bootstrapPath;
     protected $appPath;
     protected $configPath;
@@ -38,7 +38,7 @@ class LaraApp extends Container
     protected $environmentFile = '.env';
     protected $isRunningInConsole;
     protected $namespace;
-    protected $absoluteCachePathPrefixes    = ['/', '\\'];
+    protected $absoluteCachePathPrefixes = ['/', '\\'];
     protected string|array|null $useService = null;
 
     protected $bootstrappers = [
@@ -82,21 +82,21 @@ class LaraApp extends Container
      */
     public function registerSmarty($smarty_class_object)
     {
-        $prefix     = 'Facade';
-        $method     = 'registerClass';
+        $prefix = 'Facade';
+        $method = 'registerClass';
         $useService = is_null($useService = $this->useService)
             ? null
             : (array) $useService;
 
         $servicesDefault = [
-            'Arr'      => \Illuminate\Support\Arr::class,
-            'Str'      => \Illuminate\Support\Str::class,
-            'Number'   => \Illuminate\Support\Number::class,
-            'Date'     => \Illuminate\Support\Facades\Date::class,
-            'Http'     => \Illuminate\Support\Facades\Http::class,
+            'Arr' => \Illuminate\Support\Arr::class,
+            'Str' => \Illuminate\Support\Str::class,
+            'Number' => \Illuminate\Support\Number::class,
+            'Date' => \Illuminate\Support\Facades\Date::class,
+            'Http' => \Illuminate\Support\Facades\Http::class,
             'Redirect' => \Illuminate\Support\Facades\Redirect::class,
-            'Request'  => \Illuminate\Support\Facades\Request::class,
-            'URL'      => \Illuminate\Support\Facades\URL::class,
+            'Request' => \Illuminate\Support\Facades\Request::class,
+            'URL' => \Illuminate\Support\Facades\URL::class,
         ];
 
         $classRegisters = [];
@@ -412,20 +412,20 @@ class LaraApp extends Container
     {
         parent::flush();
 
-        $this->buildStack                     = [];
-        $this->loadedProviders                = [];
-        $this->bootedCallbacks                = [];
-        $this->bootingCallbacks               = [];
-        $this->deferredServices               = [];
-        $this->reboundCallbacks               = [];
-        $this->serviceProviders               = [];
-        $this->resolvingCallbacks             = [];
-        $this->terminatingCallbacks           = [];
-        $this->beforeResolvingCallbacks       = [];
-        $this->afterResolvingCallbacks        = [];
+        $this->buildStack = [];
+        $this->loadedProviders = [];
+        $this->bootedCallbacks = [];
+        $this->bootingCallbacks = [];
+        $this->deferredServices = [];
+        $this->reboundCallbacks = [];
+        $this->serviceProviders = [];
+        $this->resolvingCallbacks = [];
+        $this->terminatingCallbacks = [];
+        $this->beforeResolvingCallbacks = [];
+        $this->afterResolvingCallbacks = [];
         $this->globalBeforeResolvingCallbacks = [];
-        $this->globalResolvingCallbacks       = [];
-        $this->globalAfterResolvingCallbacks  = [];
+        $this->globalResolvingCallbacks = [];
+        $this->globalAfterResolvingCallbacks = [];
     }
 
     public function getNamespace()
@@ -612,10 +612,38 @@ class LaraApp extends Container
         $provider->callBootingCallbacks();
 
         if (method_exists($provider, 'boot')) {
+
+            // can try-catch
             $this->call([$provider, 'boot']);
         }
 
         $provider->callBootedCallbacks();
+    }
+
+    public function routesAreCached()
+    {
+        return $this['files']->exists($this->getCachedRoutesPath());
+    }
+
+    public function getCachedRoutesPath()
+    {
+        return $this->normalizeCachePath('APP_ROUTES_CACHE', '');
+    }
+
+    protected function normalizeCachePath($key, $default)
+    {
+        if (is_null($env = \Illuminate\Support\Env::get($key))) {
+            return $this->bootstrapPath($default);
+        }
+
+        return Str::startsWith($env, $this->absoluteCachePathPrefixes)
+            ? $env
+            : $this->basePath($env);
+    }
+
+    public function bootstrapPath($path = '')
+    {
+        return $this->joinPaths($this->bootstrapPath, $path);
     }
 
     public function booting($callback)
