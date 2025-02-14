@@ -8,6 +8,9 @@ composer require friendsofwebso/facade
 
 ## Use
 
+- Paste to end file bootstrap.php
+- [Old Document](https://github.com/kythuatwebso/facade/tree/f9d35378700b725341a7dd4a4d9cf62f72e40b0e)
+
 ```php
 use Illuminate\Filesystem\Filesystem;
 use Websovn\Facades\LaraApp;
@@ -28,6 +31,9 @@ $laraApp = new LaraApp(
     ]
 );
 
+// Đăng ký Smarty (nếu cần)
+$laraApp->withSmartyRegister();
+
 /**
  * Tạo File providers.php để tải thêm dịch vụ (nếu có)
  */
@@ -37,9 +43,6 @@ $laraApp = new LaraApp(
 // }
 
 $laraApp->bootstrap();
-
-// Đăng ký Smarty (nếu cần)
-$laraApp->registerSmarty(smarty());
 ```
 
 - providers.php
