@@ -78,6 +78,14 @@ class LaraApp extends Container
     }
 
     /**
+     * @deprecated - use `withSmartyRegister` instead
+     */
+    public function registerSmarty($smarty_class_object)
+    {
+        $this->withSmartyRegister();
+    }
+
+    /**
      * Đăng ký Facade vào smarty
      *
      * Sử dụng: `{Facade\Date::now()}`
