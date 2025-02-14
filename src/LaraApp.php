@@ -41,6 +41,8 @@ class LaraApp extends Container
     protected $absoluteCachePathPrefixes = ['/', '\\'];
     protected string|array|null $useService = null;
 
+    protected array $smartyRegister = [];
+
     protected $bootstrappers = [
         \Websovn\Facades\LoadLaravelConfiguration::class,
         \Websovn\Facades\RegisterFacades::class,
@@ -80,16 +82,10 @@ class LaraApp extends Container
      *
      * Sử dụng: `{Facade\Date::now()}`
      */
-    public function registerSmarty($smarty_class_object)
+    public function withSmartyRegister(array $classes = [], $smarty = null)
     {
-        $prefix = 'Facade';
-        $method = 'registerClass';
-        $useService = is_null($useService = $this->useService)
-            ? null
-            : (array) $useService;
-
         $servicesDefault = [
-            'Arr' => \Illuminate\Support\Arr::class,
+            'Arr' => Arr::class,
             'Str' => \Illuminate\Support\Str::class,
             'Number' => \Illuminate\Support\Number::class,
             'Date' => \Illuminate\Support\Facades\Date::class,
@@ -99,22 +95,25 @@ class LaraApp extends Container
             'URL' => \Illuminate\Support\Facades\URL::class,
         ];
 
-        $classRegisters = [];
-        if (! is_null($useService)) {
-            $classRegisters = array_merge(
-                $servicesDefault,
-                DefaultLaravel::facades()
-            );
-        }
+        $classRegisters = collect()
+            ->when(
+                ! is_null($this->useService),
+                fn (Collection $collection) => $collection
+                    ->merge($servicesDefault)
+                    ->merge(DefaultLaravel::facades()),
+                fn ($collection) => $collection
+            )
+            ->merge($classes)
+            ->toArray();
 
-        if (count($classRegisters) > 0) {
-            foreach ($classRegisters as $name => $class) {
-                $smarty_class_object->{$method}(
-                    "{$prefix}\\{$name}",
-                    $class
-                );
-            }
-        }
+        (new SmartyTemplateFacade($classRegisters))
+            ->when(
+                ! is_null($smarty),
+                fn ($smartyTemplate) => $smartyTemplate->setSmarty($smarty)
+            )
+            ->handle();
+
+        return $this;
     }
 
     protected function registerBaseServiceProviders()
