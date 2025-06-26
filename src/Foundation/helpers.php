@@ -663,9 +663,9 @@ if (! function_exists('uri')) {
     }
 }
 
-if (! function_exists('url')) {
+if (! function_exists('laravel_url')) {
 
-    function url($path = null, $parameters = [], $secure = null)
+    function laravel_url($path = null, $parameters = [], $secure = null)
     {
         if (is_null($path)) {
             return app(UrlGenerator::class);
