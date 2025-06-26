@@ -11,6 +11,18 @@ class DefaultLaravel
     public const ALIAS = 'alias';
 
     protected static $servicesAllow = [
+        'Config' => [
+            self::PROVIDER => [],
+            self::FACADE => [
+                \Illuminate\Support\Facades\Config::class,
+            ],
+            self::ALIAS => [
+                'config' => [
+                    \Illuminate\Config\Repository::class,
+                    \Illuminate\Contracts\Config\Repository::class,
+                ],
+            ],
+        ],
         'File' => [
             self::PROVIDER => \Illuminate\Filesystem\FilesystemServiceProvider::class,
             self::FACADE => \Illuminate\Support\Facades\File::class,

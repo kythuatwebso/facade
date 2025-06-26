@@ -2,15 +2,16 @@
 
 namespace Websovn\Facades;
 
+use Illuminate\Container\Container;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Routing\RoutingServiceProvider;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -94,7 +95,7 @@ class LaraApp extends Container
     {
         $servicesDefault = [
             'Arr' => Arr::class,
-            'Str' => \Illuminate\Support\Str::class,
+            'Str' => Str::class,
             'Number' => \Illuminate\Support\Number::class,
             'Date' => \Illuminate\Support\Facades\Date::class,
             'Http' => \Illuminate\Support\Facades\Http::class,
