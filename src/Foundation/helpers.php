@@ -63,7 +63,7 @@ if (! function_exists('abort_unless')) {
 
 if (! function_exists('action')) {
 
-    function action($name, $parameters = [], $absolute = true)
+    function action($name, $parameters = [], $absolute = true): string
     {
         return app('url')->action($name, $parameters, $absolute);
     }
@@ -83,7 +83,7 @@ if (! function_exists('app')) {
 
 if (! function_exists('app_path')) {
 
-    function app_path($path = '')
+    function app_path($path = ''): string
     {
         return app()->path($path);
     }
@@ -91,7 +91,7 @@ if (! function_exists('app_path')) {
 
 if (! function_exists('asset')) {
 
-    function asset($path, $secure = null)
+    function asset($path, $secure = null): string
     {
         return app('url')->asset($path, $secure);
     }
@@ -99,7 +99,7 @@ if (! function_exists('asset')) {
 
 if (! function_exists('auth')) {
 
-    function auth($guard = null)
+    function auth($guard = null): AuthFactory|\Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
     {
         if (is_null($guard)) {
             return app(AuthFactory::class);
@@ -111,7 +111,7 @@ if (! function_exists('auth')) {
 
 if (! function_exists('back')) {
 
-    function back($status = 302, $headers = [], $fallback = false)
+    function back($status = 302, $headers = [], $fallback = false): \Illuminate\Http\RedirectResponse
     {
         return app('redirect')->back($status, $headers, $fallback);
     }
@@ -119,7 +119,7 @@ if (! function_exists('back')) {
 
 if (! function_exists('base_path')) {
 
-    function base_path($path = '')
+    function base_path($path = ''): string
     {
         return app()->basePath($path);
     }
@@ -127,7 +127,7 @@ if (! function_exists('base_path')) {
 
 if (! function_exists('bcrypt')) {
 
-    function bcrypt($value, $options = [])
+    function bcrypt($value, $options = []): string
     {
         return app('hash')->driver('bcrypt')->make($value, $options);
     }
@@ -241,7 +241,7 @@ if (! function_exists('cookie')) {
 
 if (! function_exists('csrf_field')) {
 
-    function csrf_field()
+    function csrf_field(): HtmlString
     {
         return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'" autocomplete="off">');
     }
@@ -249,7 +249,7 @@ if (! function_exists('csrf_field')) {
 
 if (! function_exists('csrf_token')) {
 
-    function csrf_token()
+    function csrf_token(): string
     {
         $session = app('session');
 
@@ -313,7 +313,7 @@ if (! function_exists('encrypt')) {
 
 if (! function_exists('event')) {
 
-    function event(...$args)
+    function event(...$args): array|null
     {
         return app('events')->dispatch(...$args);
     }
@@ -349,7 +349,7 @@ if (! function_exists('info')) {
 
 if (! function_exists('lang_path')) {
 
-    function lang_path($path = '')
+    function lang_path($path = ''): string
     {
         return app()->langPath($path);
     }
@@ -393,7 +393,7 @@ if (! function_exists('mix')) {
 
 if (! function_exists('now')) {
 
-    function now($tz = null)
+    function now($tz = null): \Illuminate\Support\Carbon
     {
         return Date::now($tz);
     }
@@ -449,7 +449,7 @@ if (! function_exists('public_path')) {
 
 if (! function_exists('redirect')) {
 
-    function redirect($to = null, $status = 302, $headers = [], $secure = null)
+    function redirect($to = null, $status = 302, $headers = [], $secure = null): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         if (is_null($to)) {
             return app('redirect');
@@ -543,7 +543,7 @@ if (! function_exists('resource_path')) {
 
 if (! function_exists('response')) {
 
-    function response($content = null, $status = 200, array $headers = [])
+    function response($content = null, $status = 200, array $headers = []): Response|ResponseFactory
     {
         $factory = app(ResponseFactory::class);
 
@@ -575,7 +575,7 @@ if (! function_exists('secure_url')) {
 
     function secure_url($path, $parameters = [])
     {
-        return url($path, $parameters, true);
+        return laravel_url($path, $parameters, true);
     }
 }
 
@@ -677,7 +677,7 @@ if (! function_exists('laravel_url')) {
 
 if (! function_exists('validator')) {
 
-    function validator(?array $data = null, array $rules = [], array $messages = [], array $attributes = [])
+    function validator(?array $data = null, array $rules = [], array $messages = [], array $attributes = []): ValidationFactory|Validator
     {
         $factory = app(ValidationFactory::class);
 
