@@ -491,9 +491,9 @@ if (! function_exists('report_unless')) {
     }
 }
 
-if (! function_exists('request')) {
+if (! function_exists('laravel_request')) {
 
-    function request($key = null, $default = null)
+    function laravel_request($key = null, $default = null)
     {
         if (is_null($key)) {
             return app('request');
