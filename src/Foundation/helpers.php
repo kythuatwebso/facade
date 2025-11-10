@@ -89,14 +89,6 @@ if (! function_exists('app_path')) {
     }
 }
 
-if (! function_exists('asset')) {
-
-    function asset($path, $secure = null): string
-    {
-        return app('url')->asset($path, $secure);
-    }
-}
-
 if (! function_exists('auth')) {
 
     function auth($guard = null): AuthFactory|\Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
